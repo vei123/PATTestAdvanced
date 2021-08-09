@@ -25,9 +25,9 @@ string stradd(string a, string b)
 		bb[i] = (int)(b[i] - '0');
 	for (int i = 0; i < max(al, bl) + 1; i++)
 	{
-		cc[i + 1] += (aa[i] + bb[i]) / 10;
-		cc[i] += (aa[i] + bb[i]) % 10;
-		res.push_back((char)(cc[i] + '0'));
+		cc[i + 1] += (aa[i] + bb[i] + cc[i]) / 10;
+		cc[i] = (aa[i] + bb[i] + cc[i]) % 10;
+		res.push_back((char)cc[i] + '0');
 	}
 	reverse(res.begin(), res.end());
 	delprezeros(res);
