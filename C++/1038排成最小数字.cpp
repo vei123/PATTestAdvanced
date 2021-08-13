@@ -4,7 +4,7 @@
 #include<algorithm>
 using namespace std;
 
-//线性复杂度的贪心算法
+//贪心算法
 
 int n;
 string s, res;
