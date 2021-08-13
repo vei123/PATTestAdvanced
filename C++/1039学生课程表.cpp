@@ -5,9 +5,10 @@
 #include<algorithm>
 using namespace std;
 
-//这道题如果不注意某些细节很容易被卡常，无论是我自己的题解，还是网上找的题解，其运行时间均数百毫秒(甚至此题解的400ms还算快了)
+//这道题的最后一个测试点非常卡时间，网上绝大多数题解都是卡点过(500+ms)，
+//此题解的400ms甚至算快了，目前不知道有没有什么方法可以使效率有质的提升
 
-//建立从string到int的映射，期望能比直接从string哈希映射到vector够快一点，实际上不知道是不是快了...
+//用string映射到int，而不是用string直接映射到vector数组，希望能快点...
 unordered_map<string, int> ref1;
 vector<vector<int>> student;
 
@@ -47,6 +48,7 @@ signed main()
 				if (j != len - 1) cout << ' ';
 			}
 		}
+		//PAT输出格式通病：就是折磨人，每次为了处理格式必定多小10行代码！
 		if (i != n - 1) cout << '\n';
 	}
 	return 0;
