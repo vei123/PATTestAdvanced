@@ -1,83 +1,66 @@
 #include<iostream>
-#include<unordered_map>
+#include<vector>
 #include<queue>
-#define iipair pair<int,int>
-#define inf 0x7fffffff
+#define inf 0x3fffffff
 using namespace std;
 
-struct cmp
+struct node
 {
-	bool operator()(const iipair& a, const iipair& b)
-	{
-		return a.second > b.second;
-	}
+	int v, w;
+	bool operator<(const node& b) const { return w > b.w; }
 };
 
-int n, m, c1, c2;
-int d[505];
-int teams[505];
-int mincost = inf;
-int maxhands = 0;
-int paths = 0;
-unordered_map<int, vector<iipair>> graph;
-priority_queue<iipair, vector<iipair>, cmp> q;
+int n, m, src, des, teams[505];
+int d[505], r[505] = { 0 }, visit[505] = { 0 }, cnt[505] = { 0 };
+vector<vector<node>> graph;
 
-void dfs(int s, int cost, int hands,
-	unordered_map<int, int> visited)
+void dijkstra()
 {
-	if (cost > mincost) return;
-	visited[s] = 1;
-	hands += teams[s];
-	if (s == c2)
+	for (int i = 0; i < n; i++) d[i] = inf;
+	d[src] = 0;
+	r[src] = teams[src];
+	cnt[src] = 1;
+	priority_queue<node> q;
+	q.push(node{ src, 0 });
+	while (!q.empty())
 	{
-		if (cost == mincost)
+		auto e1 = q.top();
+		q.pop();
+		if (visit[e1.v]) continue;
+		visit[e1.v] = 1;
+		for (auto e2 : graph[e1.v])
 		{
-			paths++;
-			maxhands = hands > maxhands ? hands : maxhands;
+			if (d[e1.v] + e2.w < d[e2.v])
+			{
+				d[e2.v] = d[e1.v] + e2.w;
+				r[e2.v] = r[e1.v] + teams[e2.v];
+				cnt[e2.v] = cnt[e1.v];
+				q.push(node{ e2.v, d[e2.v] });
+			}
+			else if (d[e1.v] + e2.w == d[e2.v])
+			{
+				if (r[e1.v] + teams[e2.v] > r[e2.v])
+					r[e2.v] = r[e1.v] + teams[e2.v];
+				cnt[e2.v] += cnt[e1.v];
+			}
 		}
-		return;
 	}
-	for (auto e : graph[s])
-	{
-		if (!visited[e.first])
-			dfs(e.first, cost + e.second, hands, visited);
-	}
-	visited[s] = 0;
 }
 
-int main()
+signed main()
 {
 	ios::sync_with_stdio(0);
-	cin >> n >> m >> c1 >> c2;
-	for (int i = 0; i < n; i++)
-	{
-		d[i] = inf;
-		cin >> teams[i];
-	}
-	for (int i = 0; i < m; i++)
+	cin >> n >> m >> src >> des;
+	graph.resize(n);
+	for (int i = 0; i < n; i++) cin >> teams[i];
+	while (m--)
 	{
 		int u, v, w;
 		cin >> u >> v >> w;
-		if (!graph.count(u)) graph[u] = vector<iipair>();
-		if (!graph.count(v)) graph[v] = vector<iipair>();
-		graph[u].push_back({ v,w });
-		graph[v].push_back({ u,w });
+		graph[u].emplace_back(node{ v, w });
+		graph[v].emplace_back(node{ u, w });
 	}
-	q.push({ c1,0 });
-	while (!q.empty())
-	{
-		iipair e = q.top();
-		q.pop();
-		if (d[e.first] != inf) continue;
-		d[e.first] = e.second;
-		for (auto l : graph[e.first])
-		{
-			if (d[l.first] != inf) continue;
-			else q.push({ l.first, l.second + e.second });
-		}
-	}
-	mincost = d[c2];
-	dfs(c1, 0, 0, unordered_map<int, int>());
-	cout << paths << " " << maxhands;
+	dijkstra();
+	cout << cnt[des] << ' ' << r[des] << '\n';
 	return 0;
 }
