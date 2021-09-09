@@ -3,10 +3,33 @@
 #define int long long
 using namespace std;
 
+int n, p, maxnum = 0, a[100005];
+
+signed main()
+{
+	ios::sync_with_stdio(0);
+	cin >> n >> p;
+	for (int i = 0; i < n; i++) cin >> a[i];
+	sort(a, a + n);
+	int i = 0, j = 0;
+	while (i < n)
+	{
+		while (j < n && a[j] <= a[i] * p)
+		{
+			maxnum = max(maxnum, j - i + 1);
+			j++;
+		}
+		i++;
+	}
+	cout << maxnum;
+	return 0;
+}
+
+//注意int会溢出，所以要改为long long
 /*思路：
-原始想法是双重循环暴力求解，找最大值即可
+原始想法是排序后双重循环暴力求解，找最大值即可
 	for i = 0 : n-1
-		for j = 0 : n-1
+		for j = i + 1 : n-1
 			do judge and update max
 但是题目中数据量为10e5，这样肯定会超时，是不是就不能这样做了呢？
 实际上，上述循环是可以优化的。
@@ -19,13 +42,14 @@ using namespace std;
 ①首先保持i=0不变，对j递增+1，只要满足要求就继续+1，直到不满足：
 此时有a[j]>a[i]*p，如果继续增大j，a[j]也增大，势必不满足，所以停止对j增加，转②
 ②将i +1，由于a[i]增大，满不满足条件需要重新判定，所以继续对j从当前值
-开始判断，只要满足就递增+1，直到不满足，又重新转②
+(为什么从当前值开始？因为j回溯后一定是满足条件的，并且j-i+1还变小了，所以回溯是没有意义的)
+开始判断，只要满足j就递增+1，直到不满足，又重新转②
 ③当i为n时循环结束
 
 上述算法伪代码：
 set i = j = 0
 for i = 0 : n - 1
-	while(a[j] <= a[i] * p)
+	while(j < n and a[j] <= a[i] * p)
 		update max, j++;
 
 上述算法也是一个双重循环，看似有着O(n^2)复杂度，实则不然：
@@ -39,24 +63,3 @@ for i = 0 : n - 1
 下限是O(n+1)，j只增大了1就不满足条件，随后i增至n结束
 所以时间复杂度是合格的，总复杂度为排序算法复杂度，也满足要求
 */
-
-signed main()
-{
-	ios::sync_with_stdio(0);
-	int n, p, i, j, lmax = 1;
-	int a[100005];
-	cin >> n >> p;
-	for (int i = 0; i < n; i++) cin >> a[i];
-	sort(a, a + n);
-	i = j = 0;
-	for (; i < n; i++)
-	{
-		for (; j < n; j++)
-		{
-			if (a[j] <= a[i] * p) lmax = max(j - i + 1, lmax);
-			else break;
-		}
-	}
-	cout << lmax;
-	return 0;
-}
